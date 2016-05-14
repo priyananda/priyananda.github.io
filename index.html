@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content=
+    "A layout example that shows off a blog page with a list of posts.">
+    <title>
+      Candy Dispenser with Arduino
+    </title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css" type="text/css">
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css" type="text/css">
+    <link rel="stylesheet" href="css/layouts/blog.css" type="text/css">
+  </head>
+  <body>
+    <div id="layout" class="pure-g">
+      <div class="sidebar pure-u-1 pure-u-md-1-4">
+        <div class="header">
+          <h1 class="brand-title">
+            Making and Breaking Stuff
+          </h1>
+          <h2 class="brand-tagline">
+            Priyananda Shenoy
+          </h2>
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a class="pure-button" href="http://priyananda.blogspot.com">The Funny Blog</a>
+            </li>
+            <li class="nav-item">
+              <a class="pure-button" href="http://github.com/priyananda">Github</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+          <!-- A wrapper for all the blog posts -->
+          <div class="posts">
+            <h1 class="content-subhead">
+              Pinned Post
+            </h1><!-- A single blog post -->
+            <img class="post-avatar" alt="Priyananda's avatar" height="48"
+            width="48" src="img/common/priyananda.jpg">
+            <h2 class="post-title">
+              Candy Dispenser with Arduino
+            </h2>
+            <p class="post-meta">
+              By <a href="#" class="post-author">Priyananda</a> under <a class=
+              "post-category post-category-design" href="#">Arduino</a> <a class=
+              "post-category post-category-pure" href="#">Stepper Motor</a>
+               <a class= "post-category post-category-js" href="#">Candy</a> 13 May 2016
+            </p>
+            <div class="post-description">
+              <p>
+                I recently completed 7 years at Microsoft. We have this tradition of bringing <code>n</code> pounds of candy to celebrate completing <code>n</code> years.
+				(As an aside, someone in our team just completed 25 years - and yes, he brought 25 pounds!). I wanted to do something interesting this year, and this
+				looked like a nice opportunity to try out some microcontroller programming. So after researching online for a while, I decided to make a candy dispenser
+				using Arduino. And what better front-end other than Excel to control the dispensing!
+              </p>
+			  <h2>The Setup</h2>
+			  <div class="pure-u-1 pure-u-md-1-2">
+				<img class="pure-img-responsive"
+					src="https://4.bp.blogspot.com/-pkHrzy8FpQk/Vza4Lzx0wjI/AAAAAAAALF4/yVIwuJn5QFgY5G0PhWeFwdUv4qqMTYBPACLcB/s800/20160505_091436.jpg" />
+			  </div>
+			  <p>
+			  The Laptop is running Excel 2016 and has a workbook with a quiz open in it. The laptop is connected to the Arduino through USB. When someone selects
+			  a correct answer in the quiz, the dispenser drops a load of candy into the bowl.
+			  <h2>List of Parts</h2>
+			  <ul>
+				<li> <a href="https://www.adafruit.com/products/50">Arduino Uno R3</a>
+				<li> <a href="http://www.newegg.com/Product/Product.aspx?Item=9SIA27C3UG2461">ULN2003 Stepper Motor Driver Board</a>
+				<li> <a href="https://www.adafruit.com/product/858">BYJ48 Stepper Motor</a>
+				<li> <a href="http://www.ebay.com/itm/like/182004464888">MB102 Breadboard Power Supply Module</a>(Optional)
+				<li> <a href="http://www.amazon.com/KCH-06119-GAT102-Indispensable-Dispenser-Control/dp/B000NW5RRG">Zevro Dry Food Dispenser</a>
+			  </ul>
+			  <h2>Hooking up the electronics</h2>
+			  <div class="pure-u-1 pure-u-md-1-2">
+				<img class="pure-img-responsive"
+					src="img/common/electronics.png" />
+			  </div>
+			  <p>
+				The schematic above shows how to connect the stepper motor to the Arduino. The wires coming out of the Stepper motor are color
+				coded, and should match the colors shown here. You can drive the motor using Arduino's +5V output pin, but it recommended to
+				use a secondary power source (like the MB102 mentioned above - this little board takes in any input in the 5V-12V range and outputs
+				a variety of voltage levels on a variety of output pins).
+			  <p>
+				For more details about how stepper motors work, and why we are connecting them like this, check out <a href="#lref1">[1]</a> and <a href="#lref2">[2]</a>.
+			  </p>
+			  <h2>The code</h2>
+			  There are two software parts to this:
+			  <ul>
+			  <li> The Excel File which triggers the dispensing of Candy
+			  <li> The Arduino sketch which runs on the microcontroller.
+			  </ul>
+			  To get started, we need to install the <a href="https://www.arduino.cc/en/Main/Software">Arduino IDE</a>. This will also install the
+			  USB driver which will expose the Arduino as a serial (COM) device. With that, any software running on the computer can communicate with the
+			  code running on the Arduino by reading and writing data via the serial port.
+			  <p>
+			  The source code for the Arduino sketch can be found <a href="https://github.com/priyananda/learn/tree/master/arduino">here</a>.
+			  This sketch is a modified version of Bret Stateham's sample code <a href="#lref1">[3]</a> 
+			  , and uses the <a href="http://www.airspayce.com/mikem/arduino/AccelStepper/">AccelStepper</a> library to drive the motor.
+			  The code makes Arduino wait for some data to come on the serial
+			  port, and when it does, it triggers the stepper motor to turn a specified amount. We alternate between clockwise and counter-clockwise
+			  to drop the candy evenly.
+			  <code><pre>
+void setup() {
+  ...
+  Serial.begin(9600);
+}
+
+void loop() {
+
+  bool isDataAvailable = (Serial.available() > 0);
+  if (isDataAvailable)
+     Serial.read();
+
+  //Check to see if the stepper has reached the target:
+  if(stepper1.distanceToGo() == 0 && isDataAvailable){
+    ...
+  }
+  
+  //If the stepper still needs to move (distanceToGo() != 0)
+  //continue to advance (step) the motor
+  stepper1.run();
+}
+			  </code></pre>
+			  <p>
+			  The macro-enabled Excel workbook with the quiz can be found <a href="https://github.com/priyananda/learn/tree/master/arduino">here</a>. The code which actually triggers the Arduino is the <code>DispenseCandy()</code> macro, which
+			  does so by writing a single byte to the serial port, which is hardcoded to COM3.
+			  <code><pre>
+Sub DispenseCandy()
+    If Not isComPortInitialized Then
+        comPortFileHandle = FreeFile
+        Open "COM3:9600,BIN,CD0,CS0,DS0,OP0,RB64,RS,TB64" For Binary Access Write As #comPortFileHandle
+        isComPortInitialized = True
+    End If
+    Put #comPortFileHandle, , "7"
+End Sub
+			  </code></pre>
+			  <h2>The mechanical stuff</h2>
+			  <div class="pure-u-1 pure-u-md-1-2">
+				<img class="pure-img-responsive"
+					src="img/common/mechanics.jpg" />
+			  </div>
+			  <p> The Food Dispenser has a rotating shaft with a handle on the outside, and some rubber flaps on the inside. Given that the motor doesn't have a lot
+			  of torque, I cut out all but three of the flaps, and trimmed the remaining flaps so that they didn't touch the sides. I removed the handle and rigged
+			  up a makeshift gear assembly out of my son's discarded Lego pieces. This is the weakest link in the whole setup, but nothing a little tape can't fix &#x263A;.
+			  <h2>See it all in action</h2>
+			  <iframe width="560" height="315" src="https://www.youtube.com/embed/LYdi2dpXlso" frameborder="0" allowfullscreen></iframe>
+			  <h2>Links and References</h2>
+			  <ol>
+				<li id="lref1"> <a href="https://channel9.msdn.com/Shows/themakershow/8">The Maker Show - Episode 8 - Stepper Motors</a> - Excellent tutorial on how to make stepper
+					motors work with Arduino.
+				<li id="lref2"> <a href="http://aka.ms/28BYJ">28BYJ-48 Stepper Motor and ULN2003 Driver Intro</a> - Inner workings of Stepper Motors.
+				<li id="lref3"> <a href="https://github.com/BretStateham/28BYJ-48">Source Code</a> from The Maker Show episode.
+				<li id="lref4"> <a href="http://www.benrady.com/2014/10/candy-or-death-the-automatic-halloween-candy-dispenser.html">Candy or Death: The Automatic Halloween Candy Dispenser</a>
+					My main inspiration for doing this project with a far more robust way of controlling the dispenser.
+			  </ol>
+            </div>
+          </div>
+          <div class="footer">
+            <div class="pure-menu pure-menu-horizontal">
+              <ul>
+                <li class="pure-menu-item">
+                  <a href="http://twitter.com/godoftallthings" class=
+                  "pure-menu-link">Twitter</a>
+                </li>
+                <li class="pure-menu-item">
+                  <a href="http://github.com/priyananda/" class=
+                  "pure-menu-link">GitHub</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
